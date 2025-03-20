@@ -225,7 +225,7 @@ df_profit_loss = get_avg_profit_loss()
 
 
 # ✅ Debugging: Ensure data is correctly formatted
-st.write("📊 Data Preview (Avg Profit/Loss per Trade by Provider):")
+st.write("📊 Data Preview (Avg Profit/Loss per Closed Trade by Provider):")
 st.write(df_profit_loss)
 
 # ✅ Ensure `provider` names are properly cleaned
@@ -233,13 +233,13 @@ df_profit_loss["provider"] = df_profit_loss["provider"].astype(str).str.strip()
 
 # Ensure data is not empty before plotting
 if not df_profit_loss.empty:
-    st.subheader("📊 Average Profit/Loss per Trade by Provider")
+    st.subheader("📊 Average Profit/Loss per Closed Trade by Provider")
 
     # ✅ Create a sorted bar chart
     fig = px.bar(df_profit_loss, 
                  x="provider", 
                  y="avg_profit_loss_per_trade", 
-                 title="Average Profit/Loss % per Trade by Provider",
+                 title="Average Profit/Loss % per Closed Trade by Provider",
                  labels={"provider": "Provider", "avg_profit_loss_per_trade": "Avg Profit/Loss per Trade"},
                  text_auto=".2f",  # Show values on bars
                  color="avg_profit_loss_per_trade",  # Color based on profit/loss
@@ -249,7 +249,7 @@ if not df_profit_loss.empty:
     fig.update_xaxes(title_text="Provider", tickangle=-45)  # Rotate provider names if long
     
     # ✅ Adjust y-axis
-    fig.update_yaxes(title_text="Average Profit/Loss per Trade")
+    fig.update_yaxes(title_text="Average Profit/Loss per Closed Trade")
 
     # Show the plot
     st.plotly_chart(fig, use_container_width=True)
