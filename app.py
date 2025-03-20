@@ -62,7 +62,7 @@ def get_trade_metrics():
 
         # ✅ Compute Accuracy: (Profit / (Profit + Loss)) * 100
         total_trades = profit_count + loss_count
-        accuracy = (((profit_count+450) / (total_trades)) * 100) if total_trades > 0 else 0
+        accuracy = (((profit_count) / (total_trades)) * 100) if total_trades > 0 else 0
 
         conn.close()
 
@@ -192,7 +192,7 @@ def get_avg_profit_loss():
 
         # Query to get average profit/loss per trade per provider
         query = """
-        SELECT provider, AVG(current_profit_loss)*50 as avg_profit_loss_per_trade
+        SELECT provider, AVG(current_profit_loss) as avg_profit_loss_per_trade
         FROM trades
         WHERE current_profit_loss IS NOT NULL
         GROUP BY provider
@@ -346,7 +346,7 @@ def get_total_profit_loss():
         # ✅ SQL Query to calculate total profit/loss per provider
         query = """
         SELECT provider, 
-               SUM(current_profit_loss) * 50 AS total_profit_loss
+               SUM(current_profit_loss) AS total_profit_loss
         FROM trades
         WHERE provider IS NOT NULL AND current_profit_loss IS NOT NULL
         GROUP BY provider
