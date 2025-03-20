@@ -131,7 +131,7 @@ def get_traders_per_day():
 
         # Query to get distinct traders per day using created_at
         query = """
-        SELECT DATE(created_at) as trade_date, COUNT(DISTINCT trader_id) as distinct_traders 
+        SELECT DATE(created_at) as trade_date, COUNT(DISTINCT id) as distinct_traders 
         FROM trades 
         WHERE created_at IS NOT NULL
         GROUP BY trade_date 
@@ -158,7 +158,7 @@ df_trades = get_traders_per_day()
 
 # Fix X-axis display
 if not df_trades.empty:
-    st.subheader("📊 Distinct Traders Per Day (Based on Created At)")
+    st.subheader("📊 Number of Signals Per Day")
     
     fig = px.line(df_trades, 
                   x="trade_date", 
@@ -175,7 +175,7 @@ if not df_trades.empty:
     )
     
     fig.update_yaxes(
-        title_text="Number of Traders",
+        title_text="Number of Signals",
         showgrid=True
     )
 
