@@ -28,15 +28,12 @@ def get_trade_metrics():
         cursor = conn.cursor()
 
         # Get distinct trader count
-        cursor.execute("SELECT COUNT(DISTINCT trader_id) FROM trades")
+        cursor.execute("SELECT COUNT(DISTINCT id) FROM trades")
         distinct_traders = cursor.fetchone()[0]
 
         # Get distinct forex pairs & target pairs count
-        cursor.execute("SELECT COUNT(DISTINCT forex_pair) FROM trades")
+        cursor.execute("SELECT COUNT(DISTINCT CONCAT(forex_pair, target_pair)) FROM trades")
         distinct_forex_pairs = cursor.fetchone()[0]
-
-        cursor.execute("SELECT COUNT(DISTINCT target_pair) FROM trades")
-        distinct_target_pairs = cursor.fetchone()[0]
 
         # Get distinct providers count
         cursor.execute("SELECT COUNT(DISTINCT provider) FROM trades")
@@ -69,7 +66,6 @@ def get_trade_metrics():
         return {
             "distinct_traders": distinct_traders,
             "distinct_forex_pairs": distinct_forex_pairs,
-            "distinct_target_pairs": distinct_target_pairs,
             "distinct_providers": distinct_providers,
             "buy_count": buy_count,
             "sell_count": sell_count,
@@ -93,15 +89,14 @@ if metrics:
     col1, col2, col3, col4 = st.columns(4)
 
     # Display KPIs
-    col1.metric(label="Total Unique Traders", value=f"{metrics['distinct_traders']}")
-    col1.metric(label="Distinct Forex Pairs", value=f"{metrics['distinct_forex_pairs']}")
-    col1.metric(label="Distinct Target Pairs", value=f"{metrics['distinct_target_pairs']}")
-    col1.metric(label="Total Distinct Providers", value=f"{metrics['distinct_providers']}")
+    col1.metric(label="# of Signals", value=f"{metrics['distinct_traders']}")
+    col1.metric(label="# Distinct Pairs Tracked", value=f"{metrics['distinct_forex_pairs']}")
+    col1.metric(label="# Distinct Providers", value=f"{metrics['distinct_providers']}")
 
-    col2.metric(label="Buy Signals", value=f"{metrics['buy_count']}")
-    col2.metric(label="Sell Signals", value=f"{metrics['sell_count']}")
-    col2.metric(label="Active Trades", value=f"{metrics['active_count']}")
-    col2.metric(label="Non-Active Trades", value=f"{metrics['non_active_count']}")
+    col2.metric(label="# Buy Signals", value=f"{metrics['buy_count']}")
+    col2.metric(label="# Sell Signals", value=f"{metrics['sell_count']}")
+    col2.metric(label="# Open Trades", value=f"{metrics['active_count']}")
+    col2.metric(label="# Closed Trades", value=f"{metrics['non_active_count']}")
 
     col3.metric(label="Trading Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
 
