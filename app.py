@@ -383,7 +383,6 @@ def get_total_profit_loss():
 
 # Fetch data
 df_total_profit_loss = get_total_profit_loss()
-df_total_profit_loss = df_total_profit_loss[df_total_profit_loss.total_profit_loss >= 0.05]
 
 # ✅ Debugging: Ensure data is correctly formatted
 st.write("📊 Data Preview (Total Closed Profit/Loss per Provider):")
