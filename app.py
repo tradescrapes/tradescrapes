@@ -429,7 +429,7 @@ def get_basepair_performance():
         # ✅ SQL Query to calculate average profit/loss per base pair & target pair
         query = """
         SELECT forex_pair, target_pair, 
-               AVG(current_profit_loss)*100 AS avg_profit_loss
+               AVG(current_profit_loss) AS avg_profit_loss
         FROM trades
         WHERE forex_pair IS NOT NULL AND target_pair IS NOT NULL AND current_profit_loss IS NOT NULL
         GROUP BY forex_pair, target_pair
