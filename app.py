@@ -70,7 +70,7 @@ def get_trade_metrics():
         lossActiveCounts = dict(cursor.fetchall())
         lossActivecount = lossActiveCounts.get('loss', 0)
         
-        activeaccuracy = (profitActivecount/(lossActiveCounts+profitActivecount))*100
+        activeaccuracy = (profitActivecount/(lossActivecount+profitActivecount))*100
 
         conn.close()
 
