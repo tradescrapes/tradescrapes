@@ -60,6 +60,17 @@ def get_trade_metrics():
         # ✅ Compute Accuracy: (Profit / (Profit + Loss)) * 100
         total_trades = profit_count + loss_count
         accuracy = (((profit_count) / (total_trades)) * 100) if total_trades > 0 else 0
+        
+        
+        cursor.execute("SELECT 'profit' as status,COUNT(*) FROM trades where status = 'Active' and current_profit_loss > 0")
+        profitActiveCounts = dict(cursor.fetchall())
+        profitActivecount = profitActiveCounts.get('profit', 0)
+        
+        cursor.execute("SELECT 'loss' as status,COUNT(*) FROM trades where status = 'Active' and current_profit_loss < 0")
+        lossActiveCounts = dict(cursor.fetchall())
+        lossActivecount = lossActiveCounts.get('loss', 0)
+        
+        activeaccuracy = (profitActivecount/(lossActiveCounts+profitActivecount))*100
 
         conn.close()
 
@@ -71,7 +82,8 @@ def get_trade_metrics():
             "sell_count": sell_count,
             "active_count": active_count,
             "non_active_count": non_active_count,
-            "accuracy": accuracy  # ✅ Added accuracy
+            "accuracy": accuracy,
+            "activeaccuracy": activeaccuracy
         }
 
     except Exception as e:
@@ -89,16 +101,17 @@ if metrics:
     col1, col2, col3, col4 = st.columns(4)
 
     # Display KPIs
-    col1.metric(label="# of Signals", value=f"{metrics['distinct_traders']}")
-    col1.metric(label="# Distinct Pairs Tracked", value=f"{metrics['distinct_forex_pairs']}")
-    col1.metric(label="# Distinct Providers", value=f"{metrics['distinct_providers']}")
+    col1.metric(label="Total Number of Signals", value=f"{metrics['distinct_traders']}")
+    col1.metric(label="Distinct Pairs Tracked", value=f"{metrics['distinct_forex_pairs']}")
+    col1.metric(label="Distinct Providers", value=f"{metrics['distinct_providers']}")
 
-    col2.metric(label="# Buy Signals", value=f"{metrics['buy_count']}")
-    col2.metric(label="# Sell Signals", value=f"{metrics['sell_count']}")
-    col2.metric(label="# Open Trades", value=f"{metrics['active_count']}")
-    col2.metric(label="# Closed Trades", value=f"{metrics['non_active_count']}")
+    col2.metric(label="Buy Signals", value=f"{metrics['buy_count']}")
+    col2.metric(label="Sell Signals", value=f"{metrics['sell_count']}")
+    col2.metric(label="Open Trades", value=f"{metrics['active_count']}")
+    col2.metric(label="Closed Trades", value=f"{metrics['non_active_count']}")
 
-    col3.metric(label="Trading Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
+    col3.metric(label="Trading Closed Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
+    col3.metric(label="Trading Open Accuracy (%)", value=f"{metrics['activeaccuracy']:.2f}%")  # ✅ Accuracy KPI
 
 st.write("✅ Data fetched securely from MySQL and displayed in real-time.")
 
