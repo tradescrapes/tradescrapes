@@ -163,7 +163,7 @@ if not df_trades.empty:
     fig = px.line(df_trades, 
                   x="trade_date", 
                   y="distinct_traders", 
-                  title="Distinct Traders Per Day",
+                  title="Distinct Signals Per Day",
                   labels={"trade_date": "Date", "distinct_traders": "Number of Traders"},
                   markers=True)  # Add dots on points for better visibility
     
@@ -203,6 +203,7 @@ def get_avg_profit_loss():
         SELECT provider, AVG(current_profit_loss) as avg_profit_loss_per_trade
         FROM trades
         WHERE current_profit_loss IS NOT NULL
+        AND status != 'Active'
         GROUP BY provider
         ORDER BY avg_profit_loss_per_trade DESC
         """
@@ -222,6 +223,7 @@ def get_avg_profit_loss():
 # Fetch data
 df_profit_loss = get_avg_profit_loss()
 
+
 # ✅ Debugging: Ensure data is correctly formatted
 st.write("📊 Data Preview (Avg Profit/Loss per Trade by Provider):")
 st.write(df_profit_loss)
@@ -237,7 +239,7 @@ if not df_profit_loss.empty:
     fig = px.bar(df_profit_loss, 
                  x="provider", 
                  y="avg_profit_loss_per_trade", 
-                 title="Average Profit/Loss per Trade by Provider",
+                 title="Average Profit/Loss % per Trade by Provider",
                  labels={"provider": "Provider", "avg_profit_loss_per_trade": "Avg Profit/Loss per Trade"},
                  text_auto=".2f",  # Show values on bars
                  color="avg_profit_loss_per_trade",  # Color based on profit/loss
@@ -304,18 +306,18 @@ def get_provider_accuracy():
 df_accuracy = get_provider_accuracy()
 
 # ✅ Debugging: Ensure data is correctly formatted
-st.write("📊 Data Preview (Provider Accuracy %):")
+st.write("📊 Data Preview (Provider Closed Signals Accuracy %):")
 st.write(df_accuracy)
 
 # Ensure data is not empty before plotting
 if not df_accuracy.empty:
-    st.subheader("📊 Provider Accuracy (% Profit Trades)")
+    st.subheader("📊 Provider Closed Signals Accuracy (% Profit Trades)")
 
     # ✅ Create a sorted bar chart
     fig = px.bar(df_accuracy, 
                  x="provider", 
                  y="accuracy", 
-                 title="Provider Accuracy (% Profit Trades)",
+                 title="Provider Accuracy (% Closed Signals Profit Trades)",
                  labels={"provider": "Provider", "accuracy": "Accuracy (%)"},
                  text_auto=".2f",  # Show values on bars
                  color="accuracy",  # Color based on accuracy
@@ -354,9 +356,11 @@ def get_total_profit_loss():
         # ✅ SQL Query to calculate total profit/loss per provider
         query = """
         SELECT provider, 
-               SUM(current_profit_loss) AS total_profit_loss
+        SUM(current_profit_loss) AS total_profit_loss
         FROM trades
-        WHERE provider IS NOT NULL AND current_profit_loss IS NOT NULL
+        WHERE provider IS NOT NULL 
+        AND current_profit_loss IS NOT NULL
+        AND status != 'Active'
         GROUP BY provider
         ORDER BY total_profit_loss DESC
         """
@@ -382,7 +386,7 @@ df_total_profit_loss = get_total_profit_loss()
 df_total_profit_loss = df_total_profit_loss[df_total_profit_loss.total_profit_loss >= 0.05]
 
 # ✅ Debugging: Ensure data is correctly formatted
-st.write("📊 Data Preview (Total Profit/Loss per Provider):")
+st.write("📊 Data Preview (Total Closed Profit/Loss per Provider):")
 st.write(df_total_profit_loss)
 
 # ✅ Increase graph height dynamically based on number of providers
@@ -391,13 +395,13 @@ graph_height = max(800, num_providers * 30)  # ✅ Adjust height based on number
 
 # Ensure data is not empty before plotting
 if not df_total_profit_loss.empty:
-    st.subheader("📊 Total Profit/Loss per Provider")
+    st.subheader("📊 Total Closed Profit/Loss per Provider")
 
     # ✅ Create a sorted bar chart with a fixed scale
     fig = px.bar(df_total_profit_loss, 
                  x="provider", 
                  y="total_profit_loss", 
-                 title="Total Profit/Loss per Provider",
+                 title="Total Closed Profit/Loss per Provider",
                  labels={"provider": "Provider", "total_profit_loss": "Total Profit/Loss"},
                  text_auto=".2f",  # Show values on bars
                  color="total_profit_loss",  # Color based on profit/loss
@@ -437,9 +441,12 @@ def get_basepair_performance():
         # ✅ SQL Query to calculate average profit/loss per base pair & target pair
         query = """
         SELECT forex_pair, target_pair, 
-               AVG(current_profit_loss) AS avg_profit_loss
+        AVG(current_profit_loss) AS avg_profit_loss
         FROM trades
-        WHERE forex_pair IS NOT NULL AND target_pair IS NOT NULL AND current_profit_loss IS NOT NULL
+        WHERE forex_pair IS NOT NULL 
+        AND target_pair IS NOT NULL 
+        AND current_profit_loss IS NOT NULL
+        AND status != 'Active'
         GROUP BY forex_pair, target_pair
         ORDER BY avg_profit_loss DESC
         """
@@ -463,7 +470,7 @@ def get_basepair_performance():
 df_basepair_performance = get_basepair_performance()
 
 # ✅ Debugging: Ensure data is correctly formatted
-st.write("📊 Data Preview (Base Pair / Target Pair Performance):")
+st.write("📊 Data Preview Closed (Base Pair / Target Pair Performance):")
 st.write(df_basepair_performance)
 
 # ✅ Increase graph height dynamically based on number of pairs
@@ -472,13 +479,13 @@ graph_height = max(800, num_pairs * 30)  # ✅ Adjust height based on number of 
 
 # Ensure data is not empty before plotting
 if not df_basepair_performance.empty:
-    st.subheader("📊 Performance by Base Pair / Target Pair (Average Profit/Loss)")
+    st.subheader("📊 Performance by Base Pair / Target Pair Closed (Average Profit/Loss)")
 
     # ✅ Create a sorted bar chart
     fig = px.bar(df_basepair_performance, 
                  x="pair", 
                  y="avg_profit_loss", 
-                 title="Performance by Base Pair / Target Pair (Average Profit/Loss)",
+                 title="Performance by Base Pair / Target Pair Closed (Average Profit/Loss)",
                  labels={"pair": "Forex Pair / Target Pair", "avg_profit_loss": "Avg Profit/Loss"},
                  text_auto=".2f",  # Show values on bars
                  color="avg_profit_loss",  # Color based on profit/loss
