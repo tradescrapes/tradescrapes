@@ -42,7 +42,7 @@ def get_trade_metrics():
         
         
         cursor.execute("""
-        SELECT *
+        SELECT provider,accuracy
         FROM (
             SELECT 
                 provider,
