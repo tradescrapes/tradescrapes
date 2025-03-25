@@ -38,6 +38,24 @@ def get_trade_metrics():
         # Get distinct providers count
         cursor.execute("SELECT COUNT(DISTINCT provider) FROM trades")
         distinct_providers = cursor.fetchone()[0]
+        
+        
+        
+        # Get distinct providers count
+        cursor.execute("""SELECT *
+            FROM (
+                SELECT 
+                    provider,
+                    100.0 * SUM(CASE WHEN status = 'Profit' THEN 1 ELSE 0 END) /
+                    NULLIF(SUM(CASE WHEN status IN ('Profit', 'Loss') THEN 1 ELSE 0 END), 0) AS accuracy
+                FROM trades
+                GROUP BY provider
+            ) AS top_10_accuracy
+            ORDER BY accuracy DESC LIMIT 10
+            """)
+        top10 = cursor.fetchone()[0]
+        top10accuracy = top10.accuracy.mean()
+        
 
         # Get Buy vs Sell count
         cursor.execute("SELECT action, COUNT(*) FROM trades GROUP BY action")
@@ -83,7 +101,8 @@ def get_trade_metrics():
             "active_count": active_count,
             "non_active_count": non_active_count,
             "accuracy": accuracy,
-            "activeaccuracy": activeaccuracy
+            "activeaccuracy": activeaccuracy,
+            "top10accuracy" : top10accuracy
         }
 
     except Exception as e:
@@ -112,6 +131,7 @@ if metrics:
 
     col3.metric(label="Trading Closed Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
     col3.metric(label="Trading Open Accuracy (%)", value=f"{metrics['activeaccuracy']:.2f}%")  # ✅ Accuracy KPI
+    col3.metric(label="Top 10 Closed Accuracy (%)", value=f"{metrics['top10accuracy']:.2f}%")  # ✅ Accuracy KPI
 
 st.write("✅ Data fetched securely from MySQL and displayed in real-time.")
 
