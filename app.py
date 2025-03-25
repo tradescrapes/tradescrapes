@@ -53,8 +53,8 @@ def get_trade_metrics():
             ) AS top_10_accuracy
             ORDER BY accuracy DESC LIMIT 10
             """)
-        top10 = cursor.fetchone()[0]
-        top10accuracy = top10.accuracy.mean()
+        topgroups = cursor.fetchone()[0]
+        topaccuracy = topgroups.accuracy.mean()
         
 
         # Get Buy vs Sell count
@@ -102,7 +102,7 @@ def get_trade_metrics():
             "non_active_count": non_active_count,
             "accuracy": accuracy,
             "activeaccuracy": activeaccuracy,
-            "top10accuracy" : top10accuracy
+            "topaccuracy" : topaccuracy
         }
 
     except Exception as e:
@@ -131,7 +131,7 @@ if metrics:
 
     col3.metric(label="Trading Closed Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
     col3.metric(label="Trading Open Accuracy (%)", value=f"{metrics['activeaccuracy']:.2f}%")  # ✅ Accuracy KPI
-    col3.metric(label="Top 10 Closed Accuracy (%)", value=f"{metrics['top10accuracy']:.2f}%")  # ✅ Accuracy KPI
+    col3.metric(label="Top 10 Closed Accuracy (%)", value=f"{metrics['topaccuracy']:.2f}%")  # ✅ Accuracy KPI
 
 st.write("✅ Data fetched securely from MySQL and displayed in real-time.")
 
