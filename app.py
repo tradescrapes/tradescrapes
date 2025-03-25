@@ -53,7 +53,7 @@ def get_trade_metrics():
             ) AS top_10_accuracy
             ORDER BY accuracy DESC LIMIT 10
             """)
-        topgroups = cursor.fetchone()[0]
+        topgroups = cursor.fetchall()
         topaccuracy = topgroups.accuracy.mean()
         
 
