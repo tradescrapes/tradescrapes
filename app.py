@@ -41,20 +41,20 @@ def get_trade_metrics():
         
         
         
-        # Get distinct providers count
-        cursor.execute("""SELECT *
-            FROM (
-                SELECT 
-                    provider,
-                    100.0 * SUM(CASE WHEN status = 'Profit' THEN 1 ELSE 0 END) /
-                    NULLIF(SUM(CASE WHEN status IN ('Profit', 'Loss') THEN 1 ELSE 0 END), 0) AS accuracy
-                FROM trades
-                GROUP BY provider
-            ) AS top_10_accuracy
-            ORDER BY accuracy DESC LIMIT 10
-            """)
+        cursor.execute("""
+            SELECT 
+                provider,
+                100.0 * SUM(CASE WHEN status = 'Profit' THEN 1 ELSE 0 END) /
+                NULLIF(SUM(CASE WHEN status IN ('Profit', 'Loss') THEN 1 ELSE 0 END), 0) AS accuracy
+            FROM trades
+            GROUP BY provider
+            ORDER BY COUNT(*) DESC
+            LIMIT 10
+        """)
         topgroups = cursor.fetchall()
-        topaccuracy = topgroups.accuracy.mean()
+        
+        top10_df = pd.DataFrame(topgroups, columns=["provider", "accuracy"])
+        topaccuracy = top10_df["accuracy"].mean() or 0
         
 
         # Get Buy vs Sell count
