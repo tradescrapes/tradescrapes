@@ -134,8 +134,8 @@ if metrics:
     col2.metric(label="Open Trades", value=f"{metrics['active_count']}")
     col2.metric(label="Closed Trades", value=f"{metrics['non_active_count']}")
 
-    col3.metric(label="Trading Closed Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
-    col3.metric(label="Trading Open Accuracy (%)", value=f"{metrics['activeaccuracy']:.2f}%")  # ✅ Accuracy KPI
+    # col3.metric(label="Trading Closed Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
+    # col3.metric(label="Trading Open Accuracy (%)", value=f"{metrics['activeaccuracy']:.2f}%")  # ✅ Accuracy KPI
     col3.metric(label="Top 10 Closed Accuracy (%)", value=f"{metrics['topaccuracy']:.2f}%")  # ✅ Accuracy KPI
 
 st.write("✅ Data fetched securely from MySQL and displayed in real-time.")
