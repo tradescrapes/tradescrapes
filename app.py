@@ -47,11 +47,14 @@ def get_trade_metrics():
             SELECT 
                 provider,
                 100.0 * SUM(CASE WHEN status = 'Profit' THEN 1 ELSE 0 END) /
-                NULLIF(SUM(CASE WHEN status IN ('Profit', 'Loss') THEN 1 ELSE 0 END), 0) AS accuracy
+                NULLIF(SUM(CASE WHEN status IN ('Profit', 'Loss') THEN 1 ELSE 0 END), 0) AS accuracy,
+                SUM(CASE WHEN status = 'Profit' THEN 1 ELSE 0 END) AS profit_count
             FROM trades
             GROUP BY provider
+            HAVING profit_count > 5
         ) AS top_10_accuracy
-        ORDER BY accuracy DESC LIMIT 10
+        ORDER BY accuracy DESC
+        LIMIT 10
         """)
         topgroups = cursor.fetchall()
         
