@@ -60,6 +60,28 @@ def get_trade_metrics():
         
         top10_df = pd.DataFrame(topgroups, columns=["provider", "accuracy"])
         topaccuracy = top10_df["accuracy"].mean() or 0
+
+
+        
+        cursor.execute("""
+        SELECT *
+        FROM (
+            SELECT 
+                provider,
+                100.0 * SUM(CASE WHEN status = 'Profit' THEN 1 ELSE 0 END) /
+                NULLIF(SUM(CASE WHEN status IN ('Profit', 'Loss') THEN 1 ELSE 0 END), 0) AS accuracy
+            FROM trades
+            WHERE created_at >= NOW() - INTERVAL 14 DAY
+            GROUP BY provider
+        ) AS top_10_accuracy
+        ORDER BY accuracy DESC
+        LIMIT 10;
+        """)
+        topgroups2week = cursor.fetchall()
+        
+        top10_df2week = pd.DataFrame(topgroups2week, columns=["provider", "accuracy"])
+        topaccuracy2week = top10_df2week["accuracy"].mean() or 0
+        
         
 
         # Get Buy vs Sell count
@@ -107,7 +129,8 @@ def get_trade_metrics():
             "non_active_count": non_active_count,
             "accuracy": accuracy,
             "activeaccuracy": activeaccuracy,
-            "topaccuracy" : topaccuracy
+            "topaccuracy" : topaccuracy,
+            "topaccuracy2week": topaccuracy2week
         }
 
     except Exception as e:
@@ -137,6 +160,7 @@ if metrics:
     # col3.metric(label="Trading Closed Accuracy (%)", value=f"{metrics['accuracy']:.2f}%")  # ✅ Accuracy KPI
     # col3.metric(label="Trading Open Accuracy (%)", value=f"{metrics['activeaccuracy']:.2f}%")  # ✅ Accuracy KPI
     col3.metric(label="Top 10 Closed Accuracy (%)", value=f"{metrics['topaccuracy']:.2f}%")  # ✅ Accuracy KPI
+    col3.metric(label="Top 10 Closed Accuracy 2 weeks (%)", value=f"{metrics['topaccuracy2week']:.2f}%")  # ✅ Accuracy KPI
 
 st.write("✅ Data fetched securely from MySQL and displayed in real-time.")
 
